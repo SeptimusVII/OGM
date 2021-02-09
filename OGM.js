@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name         OGManager
 
-// @version      0.1
 // @description  try to take over the world!
 // @author       Septimus
 // @grant		   GM_getValue
@@ -9,6 +8,8 @@
 // @grant		   GM_deleteValue
 // @grant		   GM_getResourceURL
 // @grant		   GM_xmlhttpRequest
+// @updateURL      https://github.com/SeptimusVII/OGM/blob/main/OGM.js
+// @version        0.1.1
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -388,6 +389,7 @@
         }
     });
     console.log(planets);
+    console.log('coucou');
     initDom();
     addToLogs('Active planet/moon: '+planets[currentPlanet].name);
     dispatch();
