@@ -9,7 +9,8 @@
 // @grant		   GM_getResourceURL
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://github.com/SeptimusVII/OGM/blob/main/OGM.js
-// @version        0.1.2
+// @downloadURL    https://github.com/SeptimusVII/OGM/blob/main/OGM.js
+// @version        0.1.3
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
