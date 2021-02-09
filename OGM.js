@@ -9,7 +9,7 @@
 // @grant		   GM_getResourceURL
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://github.com/SeptimusVII/OGM/blob/main/OGM.js
-// @version        0.1.1
+// @version        0.1.2
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -389,7 +389,7 @@
         }
     });
     console.log(planets);
-    console.log('coucou');
+    console.log('coucou 2');
     initDom();
     addToLogs('Active planet/moon: '+planets[currentPlanet].name);
     dispatch();
