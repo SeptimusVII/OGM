@@ -1,16 +1,15 @@
 // ==UserScript==
 // @name         OGManager
 
-// @description  try to take over the world!
 // @author       Septimus
 // @grant		   GM_getValue
 // @grant		   GM_setValue
 // @grant		   GM_deleteValue
 // @grant		   GM_getResourceURL
 // @grant		   GM_xmlhttpRequest
-// @updateURL      https://github.com/SeptimusVII/OGM/blob/main/OGM.js
-// @downloadURL    https://github.com/SeptimusVII/OGM/blob/main/OGM.js
-// @version        0.1.3
+// @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
+// @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
+// @version        0.1.4
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -218,11 +217,7 @@
         if (getData('action') == 'exploAll' && currentExp == nbExp-1)
             setData('action', 'idle');
     }
-    var rally = function(){
-        addToLogs('# rally');
-        addToLogs('feature not working yet');
-        setData('action', 'idle');
-    }
+
     var goHome = function goHome(){
         addToLogs('# goHome');
         var home = planets[getData('rallyPoint')]; // hircine
@@ -245,10 +240,12 @@
         $('#missionButton3').trigger('click');
         $('#allresources').trigger('click');
         setTimeout(function(){
-            // $('#sendFleet').trigger('click')
-            alert('sent fleet from '+planets[currentPlanet].name+' to '+planets[getData('rallyPoint')].name);
-            if (getData('action') == 'rally')
-                window.location.href = window.location.href.split('?')[0] + `?page=ingame&component=fleetdispatch&cp=${planets[getData('arrPlanetTodo').split(',')[0]].id}`;
+            $('#sendFleet').trigger('click');
+            // alert('sent fleet from '+planets[currentPlanet].name+' to '+planets[getData('rallyPoint')].name);
+            setTimeout(function(){
+                if (getData('action') == 'rally')
+                    window.location.href = window.location.href.split('?')[0] + `?page=ingame&component=fleetdispatch&cp=${planets[getData('arrPlanetTodo').split(',')[0]].id}`;
+            },100)
         },delaySendFleet);
         if (getData('action') == 'goHome')
             setData('action', 'idle');
@@ -339,7 +336,9 @@
                     var arrPlanetTodo = getData('arrPlanetTodo').split(',');
                     if (params.component && params.component == 'fleetdispatch' && currentPlanet == arrPlanetTodo[0]){
                         setData('arrPlanetTodo', arrPlanetTodo.slice(1).join(','));
-                        goHome();
+                        setTimeout(function(){
+                            goHome();
+                        },200)
                     }
                     else{
                         setData('action', action);
@@ -390,7 +389,6 @@
         }
     });
     console.log(planets);
-    console.log('coucou 2');
     initDom();
     addToLogs('Active planet/moon: '+planets[currentPlanet].name);
     dispatch();
