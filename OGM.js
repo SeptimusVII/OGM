@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.1.4
+// @version        0.1.5
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -242,10 +242,10 @@
         setTimeout(function(){
             $('#sendFleet').trigger('click');
             // alert('sent fleet from '+planets[currentPlanet].name+' to '+planets[getData('rallyPoint')].name);
-            setTimeout(function(){
-                if (getData('action') == 'rally')
-                    window.location.href = window.location.href.split('?')[0] + `?page=ingame&component=fleetdispatch&cp=${planets[getData('arrPlanetTodo').split(',')[0]].id}`;
-            },100)
+            // setTimeout(function(){
+            //     if (getData('action') == 'rally')
+            //         window.location.href = window.location.href.split('?')[0] + `?page=ingame&component=fleetdispatch&cp=${planets[getData('arrPlanetTodo').split(',')[0]].id}`;
+            // },100)
         },delaySendFleet);
         if (getData('action') == 'goHome')
             setData('action', 'idle');
@@ -338,7 +338,7 @@
                         setData('arrPlanetTodo', arrPlanetTodo.slice(1).join(','));
                         setTimeout(function(){
                             goHome();
-                        },200)
+                        },delaySendFleet)
                     }
                     else{
                         setData('action', action);
