@@ -43,6 +43,7 @@
                     <div class="tabs">
                         <div class="tabs__nav">
                             <span class="button explo active">Exploration</span>
+                            <span class="button rally">Rapatriement</span>
                         </div>
                         <div class="tabs__wrapper">
                             <div class="tab explo active">
@@ -92,10 +93,30 @@
                                 <i>Envoi toutes les expéditions dans le système courant. Plus rapide, mais épuise le système plus rapidement.</i>
                                 <br>
                                 <br>
+                                <br>
                                 <p style="font-size:1.5em; margin-bottom: 0.5em;">Nombre d'heures</p>
                                 <div class="input--group">
                                     <div><input min=1 class="saveOnChange" value="${getData('nbHours')||0}" id="ogm__input--nbHours" name="nbHours" type="number"></div>
                                 </div>
+                            </div>
+                            <div class="tab rally">
+                                <i>Le rapatriement de ressources s'effectue uniquement à l'aide de <u>grand transporteurs</u>.</i>
+                                <br>
+                                <br>
+                                <p style="font-size:1.5em; margin-bottom: 0.5em;">Espace fret GT</p>
+                                <div class="input--group">
+                                    <div><input min=1 class="saveOnChange" value="${getData('fretGT')||25000}" id="ogm__input--fretGT" name="fretGT" type="number"></div>
+                                </div>
+                                <i>Indiquez la capacité de fret des GT.</i>
+                                <br>
+                                <br>
+                                <p style="font-size:1.5em; margin-bottom: 0.5em;">Réserve de deuterium</p>
+                                <div class="input--group">
+                                    <div><input min=0 class="saveOnChange" value="${getData('stockDeut')||0}" id="ogm__input--stockDeut" name="stockDeut" type="number"></div>
+                                </div>
+                                <i>Indiquez si besoin une quantité minimum de deuterium à laisser sur place.</i>
+                                <br>
+                                <br>
                             </div>
                         </div>
                     </div>
@@ -204,6 +225,7 @@
             }
         }
 
+        $('#fleet1 #shipsChosen input[type=text]').val('').trigger('keyup');
         for(var ship in ships)
             $('input[name='+ship+']').val(getData('explo_nb_'+ship)).trigger('keyup');
         $('#continueToFleet2').trigger('click');
@@ -222,7 +244,7 @@
     var goHome = function goHome(){
         addToLogs('# goHome');
         var home = planets[getData('rallyPoint')]; // hircine
-        var fret =  48750;
+        var fret = getData('fretGT');
         var ressources = parseInt($('#resources_metal').text().replace(/\./g, '')) + parseInt($('#resources_crystal').text().replace(/\./g, '')) + parseInt($('#resources_deuterium').text().replace(/\./g, ''));
         var nbGT = Math.ceil(ressources/fret);
         addToLogs('rally point: '+home.name);
@@ -299,7 +321,8 @@
 
         style.innerHTML += '.tabs{}';
         style.innerHTML += '.tabs__nav{margin-bottom: 1em; padding-bottom: 1em; border-bottom: 1px solid grey;}';
-        style.innerHTML += '.tabs__nav .button{font-size: 1.5em; text-transform: uppercase; opacity: 0.4; cursor: pointer;}';
+        style.innerHTML += '.tabs__nav .button{font-size: 1.5em; text-transform: uppercase; opacity: 0.15; cursor: pointer;}';
+        style.innerHTML += '.tabs__nav .button+.button{ margin-left: 0.5em; padding-left: 0.6em; border-left: 1px solid grey;}';
         style.innerHTML += '.tabs__nav .button.active,.tabs__nav .button:hover{opacity: 1;}';
         style.innerHTML += '.tabs__wrapper{}';
         style.innerHTML += '.tabs__wrapper .tab{opacity: 0; pointer-events: none; height: 0; overflow: hidden;}';
