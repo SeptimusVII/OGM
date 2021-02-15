@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.1.6
+// @version        0.1.7
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -171,14 +171,17 @@
         var $btnRally       = $('<button data-ogmaction="rally" class="ogm__btn-icon rally" title="Rapatrier les ressources de toutes les planètes"></button>');
         var $btnExplo       = $('<button data-ogmaction="explo" class="ogm__btn-icon expe" title="Lancer une exploration"></button>');
         var $btnExploAll    = $('<button data-ogmaction="exploAll" class="ogm__btn-icon expeAll" title="Lancer toutes les explorations"></button>');
-        var $btnConfig      = $('<p class="ogm__btn-link" style="text-align: center;">Options</p>').on('click',function(){
+        var $btnConfig      = $('<span class="ogm__btn-link" style="text-align: center;">Options</span>').on('click',function(){
             openConfig();
+        });
+        var $btnKillScript  = $('<span class="ogm__btn-link" style="text-align: center;">Kill</span>').on('click',function(){
+            setData('action', 'iddle');
         });
 
         $('#links')
             .append($feature.clone().append('<p class="title">Rapatriement</p>').append($selectPlanet).append('<br>').append($btnGoHome).append($btnRally))
             .append($feature.clone().append('<p class="title">Exploration</p>').append($btnExplo).append($btnExploAll).append($btnConfig))
-            .append($feature.clone().append($btnConfig));
+            .append($feature.clone().css('text-align','center').append($btnConfig).append(' | ').append($btnKillScript));
         writeStyle();
         addToLogs('Dom init end');
     }
