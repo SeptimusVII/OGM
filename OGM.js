@@ -211,7 +211,7 @@
         $('#continueToFleet3').trigger('click');
         $('#missionButton15').trigger('click');
         $('#expeditiontime').val(nbHours).trigger('change');
-        setTimeout(function(){$('#sendFleet').trigger('click')},delaySendFleet);
+        sendFleet()
         if (getData('action') == 'explo')
             setData('action', 'idle');
         if (getData('action') == 'exploAll' && currentExp == nbExp-1)
@@ -239,20 +239,28 @@
         $('#continueToFleet3').trigger('click');
         $('#missionButton3').trigger('click');
         $('#allresources').trigger('click');
-        setTimeout(function(){
-            $('#sendFleet').trigger('click');
-            // alert('sent fleet from '+planets[currentPlanet].name+' to '+planets[getData('rallyPoint')].name);
-            // setTimeout(function(){
-            //     if (getData('action') == 'rally')
-            //         window.location.href = window.location.href.split('?')[0] + `?page=ingame&component=fleetdispatch&cp=${planets[getData('arrPlanetTodo').split(',')[0]].id}`;
-            // },100)
-        },delaySendFleet);
         if (getData('action') == 'goHome')
             setData('action', 'idle');
         if (getData('action') == 'rally' && getData('arrPlanetTodo') == '')
             setData('action', 'idle');
+        sendFleet()
     }
 
+    var timerReady;
+    var sendFleet = function(){
+        addToLogs('waiting to send fleet...')
+        clearTimeout(timerReady);
+        if ($('#fleet3').length) {
+            timerReady = setTimeout(function(){
+                if ($('#fleet3').css('display') == 'none') 
+                    sendFleet();
+                else {
+                    addToLogs('fleet sent')
+                    $('#sendFleet').trigger('click');
+                }
+            },300);
+        }
+    }
 
 
     var writeStyle = function(data){
@@ -338,7 +346,7 @@
                         setData('arrPlanetTodo', arrPlanetTodo.slice(1).join(','));
                         setTimeout(function(){
                             goHome();
-                        },delaySendFleet)
+                        },1000)
                     }
                     else{
                         setData('action', action);
