@@ -211,11 +211,11 @@
         $('#continueToFleet3').trigger('click');
         $('#missionButton15').trigger('click');
         $('#expeditiontime').val(nbHours).trigger('change');
-        sendFleet()
         if (getData('action') == 'explo')
             setData('action', 'idle');
         if (getData('action') == 'exploAll' && currentExp == nbExp-1)
             setData('action', 'idle');
+        sendFleet();
     }
 
     var goHome = function goHome(){
@@ -243,7 +243,7 @@
             setData('action', 'idle');
         if (getData('action') == 'rally' && getData('arrPlanetTodo') == '')
             setData('action', 'idle');
-        sendFleet()
+        sendFleet();
     }
 
     var timerReady;
