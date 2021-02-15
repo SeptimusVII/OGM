@@ -243,12 +243,17 @@
 
     var goHome = function goHome(){
         addToLogs('# goHome');
-        var home = planets[getData('rallyPoint')]; // hircine
-        var fret = getData('fretGT');
-        var ressources = parseInt($('#resources_metal').text().replace(/\./g, '')) + parseInt($('#resources_crystal').text().replace(/\./g, '')) + parseInt($('#resources_deuterium').text().replace(/\./g, ''));
-        var nbGT = Math.ceil(ressources/fret);
+        var home        = planets[getData('rallyPoint')]; // hircine
+        var fret        = parseInt(getData('fretGT'));
+        var stockDeut   = parseInt(getData('stockDeut'));
+        var ressources  = parseInt($('#resources_metal').text().replace(/\./g, '')) 
+                        + parseInt($('#resources_crystal').text().replace(/\./g, '')) 
+                        + parseInt($('#resources_deuterium').text().replace(/\./g, '')) 
+                        - stockDeut;
+        var nbGT        = Math.ceil(ressources/fret);
         addToLogs('rally point: '+home.name);
         addToLogs('ressources :'+ressources);
+        addToLogs('stockDeut :'+stockDeut);
         addToLogs('fret :'+fret);
         addToLogs('nbGT :'+nbGT);
 
@@ -261,7 +266,12 @@
             $('#mbutton').trigger('click');
         $('#continueToFleet3').trigger('click');
         $('#missionButton3').trigger('click');
-        $('#allresources').trigger('click');
+
+        // $('#allresources').trigger('click');
+        $('#selectMaxMetal').trigger('click');
+        $('#selectMaxCrystal').trigger('click');
+        $('#deuterium').val( parseInt($('#resources_deuterium').text().replace(/\./g, '')) - stockDeut ).trigger('keyup');
+
         if (getData('action') == 'goHome')
             setData('action', 'idle');
         if (getData('action') == 'rally' && getData('arrPlanetTodo') == '')
