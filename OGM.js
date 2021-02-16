@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.1.7
+// @version        0.1.8
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -175,6 +175,7 @@
             openConfig();
         });
         var $btnKillScript  = $('<span class="ogm__btn-link" style="text-align: center;">Kill</span>').on('click',function(){
+            setData('arrPlanetTodo', '');
             setData('action', 'iddle');
         });
 
