@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.1.8
+// @version        0.1.9
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -272,9 +272,9 @@
         $('#missionButton3').trigger('click');
 
         // $('#allresources').trigger('click');
-        $('#selectMaxMetal').trigger('click');
-        $('#selectMaxCrystal').trigger('click');
         $('#deuterium').val( parseInt($('#resources_deuterium').text().replace(/\./g, '')) - stockDeut ).trigger('keyup');
+        $('#selectMaxCrystal').trigger('click');
+        $('#selectMaxMetal').trigger('click');
 
         if (getData('action') == 'goHome')
             setData('action', 'idle');
