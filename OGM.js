@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.1.9
+// @version        0.1.10
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -18,12 +18,30 @@
 (function() {
     'use strict';
     var delaySendFleet = 500;
+    var displayPreviousLogs = true;
     var planets = {};
-    var addToLogs = function(str){
-        $('.ogm__logs').append('<br>'+str);
+    var addToLogs = function(str, store = true, displayDate = true){
+        var lb = '';
+        if (str.includes('#'))
+            lb = '<br>';
+        if (displayDate) {
+            var date = '['+new Date().toLocaleDateString()+'|'+new Date().toLocaleTimeString()+']';
+            $('.ogm__logs').append('<div class="log">'+lb+date+' '+str+'</div>');
+        } else {
+            $('.ogm__logs').append('<div class="log">'+lb+str+'</div>');
+        }
+        if(store){
+            var logs = [];
+            if (getData('logs')) 
+                logs = getData('logs').split(',');
+            logs.push(date+' '+str);
+            setData('logs', logs.join(','));
+        }
     }
     var clearLogs = function(){
+        localStorage.removeItem('ogm__logs');
         $('.ogm__logs').html('');
+        addToLogs('# clearLogs');
     }
     var getData = function(name){
         var data = localStorage.getItem('ogm__'+name);
@@ -31,11 +49,19 @@
     }
     var setData = function(name,value){
         localStorage.setItem('ogm__'+name,value);
-        addToLogs('Changed '+name+' value to '+value);
+        if (name != 'logs') {
+            addToLogs('Changed '+name+' value to '+value);
+        }
     }
     var initDom = function(){
         $('<div class="ogm__logs"></div>').appendTo('body');
-        addToLogs('# initDom');
+        $('<button class="ogm__clearLogs">clear logs</button>').appendTo('body');
+        // writing previous logs
+        if (getData('logs') && displayPreviousLogs) 
+            for(var log of getData('logs').split(','))
+                addToLogs(log, false, false)
+        addToLogs('<br><hr>',false,false);
+        addToLogs('# initDom',false);
         $(`
             <div class="ogm__modal config">
                 <div class="ogm__modal__wrapper">
@@ -96,7 +122,7 @@
                                 <br>
                                 <p style="font-size:1.5em; margin-bottom: 0.5em;">Nombre d'heures</p>
                                 <div class="input--group">
-                                    <div><input min=1 class="saveOnChange" value="${getData('nbHours')||0}" id="ogm__input--nbHours" name="nbHours" type="number"></div>
+                                    <div><input min=1 max=10 class="saveOnChange" value="${getData('nbHours')||0}" id="ogm__input--nbHours" name="nbHours" type="number"></div>
                                 </div>
                             </div>
                             <div class="tab rally">
@@ -123,6 +149,7 @@
                 </div>
             </div>
         `).appendTo('body');
+        addToLogs('config modal added to dom',false);
 
         var $selectPlanet = $(`<select name="rallyPoint" class="selectPlanet saveOnChange" style="visibility: visible;"></select>`)
         for(var planet in planets){
@@ -133,6 +160,25 @@
         }
         // $selectPlanet.appendTo('.ogm__modal.config .tab.rally .selectContainer');
 
+
+
+        var $feature        = $('<div class="ogm__feature"></div>');
+        var $btnGoHome      = $('<button data-ogmaction="goHome" class="ogm__btn-icon station" title="Rapatrier les ressources de cette planète"></button>');
+        var $btnRally       = $('<button data-ogmaction="rally" class="ogm__btn-icon rally" title="Rapatrier les ressources de toutes les planètes"></button>');
+        var $btnExplo       = $('<button data-ogmaction="explo" class="ogm__btn-icon expe" title="Lancer une exploration"></button>');
+        var $btnExploAll    = $('<button data-ogmaction="exploAll" class="ogm__btn-icon expeAll" title="Lancer toutes les explorations"></button>');
+        var $btnConfig      = $('<span class="ogm__btn-link" style="text-align: center;">Options</span>').on('click',function(){
+            openConfig();
+        });
+        var $btnKillScript  = $('<span class="ogm__btn-link" style="text-align: center;">Kill</span>').on('click',function(){
+            setData('arrPlanetTodo', '');
+            setData('action', 'iddle');
+        });
+        $('#links')
+            .append($feature.clone().append('<p class="title">Rapatriement</p>').append($selectPlanet).append('<br>').append($btnGoHome).append($btnRally))
+            .append($feature.clone().append('<p class="title">Exploration</p>').append($btnExplo).append($btnExploAll).append($btnConfig))
+            .append($feature.clone().css('text-align','center').append($btnConfig).append(' | ').append($btnKillScript));
+        addToLogs('UI added to dom',false);
 
         $('.tabs .tabs__nav .button').each(function(index,button){
             button = $(button);
@@ -145,10 +191,8 @@
             });
         });
         $('body').on('change','.saveOnChange',function(){
-            console.log(this.name, this.value);
             setData(this.name, this.value);
         });
-
 
         var modalMouseDown;
         var modalMouseUp;
@@ -165,26 +209,11 @@
             setData('action', $(this).attr('data-ogmaction'));
             dispatch();
         })
+        $('.ogm__clearLogs').on('click',clearLogs);
+        addToLogs('events setup',false);
 
-        var $feature = $('<div class="ogm__feature"></div>');
-        var $btnGoHome      = $('<button data-ogmaction="goHome" class="ogm__btn-icon station" title="Rapatrier les ressources de cette planète"></button>');
-        var $btnRally       = $('<button data-ogmaction="rally" class="ogm__btn-icon rally" title="Rapatrier les ressources de toutes les planètes"></button>');
-        var $btnExplo       = $('<button data-ogmaction="explo" class="ogm__btn-icon expe" title="Lancer une exploration"></button>');
-        var $btnExploAll    = $('<button data-ogmaction="exploAll" class="ogm__btn-icon expeAll" title="Lancer toutes les explorations"></button>');
-        var $btnConfig      = $('<span class="ogm__btn-link" style="text-align: center;">Options</span>').on('click',function(){
-            openConfig();
-        });
-        var $btnKillScript  = $('<span class="ogm__btn-link" style="text-align: center;">Kill</span>').on('click',function(){
-            setData('arrPlanetTodo', '');
-            setData('action', 'iddle');
-        });
-
-        $('#links')
-            .append($feature.clone().append('<p class="title">Rapatriement</p>').append($selectPlanet).append('<br>').append($btnGoHome).append($btnRally))
-            .append($feature.clone().append('<p class="title">Exploration</p>').append($btnExplo).append($btnExploAll).append($btnConfig))
-            .append($feature.clone().css('text-align','center').append($btnConfig).append(' | ').append($btnKillScript));
-        writeStyle();
-        addToLogs('Dom init end');
+        writeStyle();  
+        addToLogs('Dom init end',false);
     }
     var openConfig = function(){
         addToLogs('# openConfig');
@@ -211,7 +240,6 @@
         var nbExp       = parseInt($('#slots>div').eq(1).text().match(/\d+\/+\d/)[0].split('/')[1]);
         var system      = planets[currentPlanet].coords[1];
         if (getData('exploMode') == 'spread') {
-            console.log(system,Math.ceil(nbExp/2), currentExp);
             system = system - (Math.ceil(nbExp/2) -  currentExp);
             if (system == planets[currentPlanet].coords[1])
                 system = system + Math.floor(nbExp/2);
@@ -262,6 +290,7 @@
         addToLogs('nbGT :'+nbGT);
 
         $('input[name=transporterLarge]').val(nbGT).trigger('keyup');
+        addToLogs('nbGT selected :'+$('input[name=transporterLarge]').val());
         $('#continueToFleet2').trigger('click');
         $('input#galaxy').val(home.coords[0]).trigger('keyup');
         $('input#system').val(home.coords[1]).trigger('keyup');
@@ -301,12 +330,16 @@
 
 
     var writeStyle = function(data){
-        addToLogs('# writeStyle')
+        addToLogs('writeStyle',false)
         // addToLogs('writing styles...');
         var style = document.createElement('style');
         style.innerHTML = '';
         style.innerHTML += '#toolbarcomponent,#links{max-width: 100%;}';
         style.innerHTML += '.ogm__logs{position: fixed; bottom:30px; left:10px; font-size:0.6rem; color: white; font-family: monospace; }';
+        style.innerHTML += '.ogm__logs .log{opacity:0.2; cursor: default;}';
+        style.innerHTML += '.ogm__logs .log:hover{opacity:1}';
+        style.innerHTML += '.ogm__logs hr+br{display:none;}';
+        style.innerHTML += '.ogm__clearLogs{position: fixed; top:30px; left:10px; cursor: pointer; z-index:1; }';
         style.innerHTML += '.ogm__btn{cursor: pointer}';
         style.innerHTML += '.ogm__btn-icon{background: url("//gf2.geo.gfsrv.net/cdn14/f45a18b5e55d2d38e7bdc3151b1fee.jpg") no-repeat; display: inline-block; width: 54px; height: 54px; font-size: 9px; text-align: center; color: #848484; cursor:pointer; }';
         style.innerHTML += '.ogm__btn-icon.expe         {background-position: 0 0px;}';
@@ -358,7 +391,9 @@
         var params = {};
         for( var param of window.location.search.replace('?','').split('&') )
             params[param.split('=')[0]] = param.split('=')[1];
-        addToLogs('# dispatch action: '+action);
+        addToLogs('# dispatch');
+        addToLogs('Active planet/moon: '+planets[currentPlanet].name);
+        addToLogs('Action: '+action);
         switch(action){
             case 'exploAll': 
             case 'explo': 
@@ -434,9 +469,7 @@
             i++;
         }
     });
-    console.log(planets);
     initDom();
-    addToLogs('Active planet/moon: '+planets[currentPlanet].name);
     dispatch();
     
 })();
