@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.1.10
+// @version        0.1.11
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -57,9 +57,13 @@
         $('<div class="ogm__logs"></div>').appendTo('body');
         $('<button class="ogm__clearLogs">clear logs</button>').appendTo('body');
         // writing previous logs
-        if (getData('logs') && displayPreviousLogs) 
-            for(var log of getData('logs').split(','))
+        if (getData('logs') && displayPreviousLogs) {
+            var logs = getData('logs').split(',');
+            if (logs.length > 50)
+                logs.splice(0,logs.length - 50);
+            for(var log of logs)
                 addToLogs(log, false, false)
+        }
         addToLogs('<br><hr>',false,false);
         addToLogs('# initDom',false);
         $(`
@@ -417,9 +421,7 @@
                     var arrPlanetTodo = getData('arrPlanetTodo').split(',');
                     if (params.component && params.component == 'fleetdispatch' && currentPlanet == arrPlanetTodo[0]){
                         setData('arrPlanetTodo', arrPlanetTodo.slice(1).join(','));
-                        setTimeout(function(){
-                            goHome();
-                        },1000)
+                        setTimeout(function(){goHome();},1000)
                     }
                     else{
                         setData('action', action);
