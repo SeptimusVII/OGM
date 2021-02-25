@@ -37,6 +37,7 @@
             logs.push(date+' '+str);
             setData('logs', logs.join(','));
         }
+        $('.ogm__logs').get(0).scrollTop = $('.ogm__logs').get(0).scrollHeight
     }
     var clearLogs = function(){
         localStorage.removeItem('ogm__logs');
@@ -59,8 +60,8 @@
         // writing previous logs
         if (getData('logs') && displayPreviousLogs) {
             var logs = getData('logs').split(',');
-            if (logs.length > 50)
-                logs.splice(0,logs.length - 50);
+            if (logs.length > 100)
+                logs.splice(0,logs.length - 100);
             for(var log of logs)
                 addToLogs(log, false, false)
         }
@@ -339,8 +340,8 @@
         var style = document.createElement('style');
         style.innerHTML = '';
         style.innerHTML += '#toolbarcomponent,#links{max-width: 100%;}';
-        style.innerHTML += '.ogm__logs{position: fixed; bottom:30px; left:10px; font-size:0.6rem; color: white; font-family: monospace; }';
-        style.innerHTML += '.ogm__logs .log{opacity:0.2; cursor: default;}';
+        style.innerHTML += '.ogm__logs{position: fixed; bottom:20px; left:-17px; padding: 10px; font-size:0.6rem; color: white; font-family: monospace; max-height: 90vh; overflow: auto; direction: rtl; }';
+        style.innerHTML += '.ogm__logs .log{opacity:0.2; cursor: default;  direction: ltr;}';
         style.innerHTML += '.ogm__logs .log:hover{opacity:1}';
         style.innerHTML += '.ogm__logs hr+br{display:none;}';
         style.innerHTML += '.ogm__clearLogs{position: fixed; top:30px; left:10px; cursor: pointer; z-index:1; }';
