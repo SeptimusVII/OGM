@@ -394,11 +394,14 @@
         // setData('action', 'idle');
         var action = getData('action') || 'idle';
         var params = {};
+        var store = true;
+        if (action == 'idle')
+            store = false;
         for( var param of window.location.search.replace('?','').split('&') )
             params[param.split('=')[0]] = param.split('=')[1];
-        addToLogs('# dispatch');
-        addToLogs('Active planet/moon: '+planets[currentPlanet].name);
-        addToLogs('Action: '+action);
+        addToLogs('# dispatch',store);
+        addToLogs('Active planet/moon: '+planets[currentPlanet].name,store);
+        addToLogs('Action: '+action,store);
         switch(action){
             case 'exploAll': 
             case 'explo': 
