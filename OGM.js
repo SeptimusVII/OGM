@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.1.13
+// @version        0.2.0
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -75,6 +75,7 @@
                         <div class="tabs__nav">
                             <span class="button explo active">Exploration</span>
                             <span class="button rally">Rapatriement</span>
+                            <span class="button createCDR">CDR(s)</span>
                         </div>
                         <div class="tabs__wrapper">
                             <div class="tab explo active">
@@ -149,6 +150,14 @@
                                 <br>
                                 <br>
                             </div>
+                            <div class="tab createCDR">
+                                <i>Envoie une sonde en mode attaque à chaque coordonnées renseigné.</i>
+                                <br>
+                                <br>
+                                <input style="width: 100%" class="saveOnChange" value="${getData('arrCoordsCDR')||''}" id="ogm__input--arrCoordsCDR" name="arrCoordsCDR" type="text">
+                                <br>
+                                <i>Indiquez une liste de coordonnées, chacune séparée par une virgule. Pour indiquer une lune, ajoutez "-m" à la fin des coordonnées. ex: 1:365:5,1:444:8-m,3:52:1</i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -172,16 +181,19 @@
         var $btnRally       = $('<button data-ogmaction="rally" class="ogm__btn-icon rally" title="Rapatrier les ressources de toutes les planètes"></button>');
         var $btnExplo       = $('<button data-ogmaction="explo" class="ogm__btn-icon expe" title="Lancer une exploration"></button>');
         var $btnExploAll    = $('<button data-ogmaction="exploAll" class="ogm__btn-icon expeAll" title="Lancer toutes les explorations"></button>');
+        var $btnCDR         = $('<button data-ogmaction="createCDR" class="ogm__btn-icon recycle" title="Lancer la création de CDR(s)"></button>');
         var $btnConfig      = $('<span class="ogm__btn-link" style="text-align: center;">Options</span>').on('click',function(){
             openConfig();
         });
         var $btnKillScript  = $('<span class="ogm__btn-link" style="text-align: center;">Kill</span>').on('click',function(){
             setData('arrPlanetTodo', '');
+            setData('arrCDRToDo', '');
             setData('action', 'iddle');
         });
         $('#links')
             .append($feature.clone().append('<p class="title">Rapatriement</p>').append($selectPlanet).append('<br>').append($btnGoHome).append($btnRally))
-            .append($feature.clone().append('<p class="title">Exploration</p>').append($btnExplo).append($btnExploAll).append($btnConfig))
+            .append($feature.clone().append('<p class="title">Exploration</p>').append($btnExplo).append($btnExploAll))
+            .append($feature.clone().append('<p class="title">Générer CDR(s)</p>').append($btnCDR))
             .append($feature.clone().css('text-align','center').append($btnConfig).append(' | ').append($btnKillScript));
         addToLogs('UI added to dom',false);
 
@@ -478,8 +490,23 @@
                     window.location.href = window.location.href.split('?')[0] + `?page=ingame&component=fleetdispatch&cp=${planets[currentPlanet].id}`;
                 }
             break;
+            case 'createCDR':
+                if (!getData('arrCoordsCDR'))
+                    setData('arrCoordsCDR', '');
+                if (params.component && params.component == 'fleetdispatch'){
+                    if (getData('arrCDRToDo') == '' || !getData('arrCDRToDo')) {
+                        setData('arrCDRToDo',getData('arrCoordsCDR'));
+                    }
+                    createCDR();
+                }
+                else{
+                    setData('action', action);
+                    window.location.href = window.location.href.split('?')[0] + `?page=ingame&component=fleetdispatch&cp=${planets[currentPlanet].id}`;
+                }
+            break;
             case 'idle': 
                 localStorage.setItem('ogm__arrPlanetTodo','');
+                localStorage.setItem('ogm__arrCDRToDo','');
             break;
         }
     }
