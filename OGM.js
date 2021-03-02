@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.1.12
+// @version        0.1.13
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -249,6 +249,7 @@
             if (system == planets[currentPlanet].coords[1])
                 system = system + Math.floor(nbExp/2);
         }
+        addToLogs('exploration: '+(currentExp+1)+'/'+nbExp);
         addToLogs('target system: '+system)
 
         if (currentExp == 0) {
@@ -262,9 +263,9 @@
             }
         }
 
-        $('#fleet1 #shipsChosen input[type=text]').val('').trigger('keyup');
+        $('#fleet1 #shipsChosen input[type=text]').val('').trigger('keyup').trigger('blur');
         for(var ship in ships)
-            $('input[name='+ship+']').val(getData('explo_nb_'+ship)).trigger('keyup');
+            $('input[name='+ship+']').val(getData('explo_nb_'+ship)).trigger('keyup').trigger('blur');
         $('#continueToFleet2').trigger('click');
         $('input#system').val(system).trigger('keyup');
         $('input#position').val(16).trigger('keyup');
@@ -292,9 +293,9 @@
         addToLogs('ressources :'+ressources);
         addToLogs('stockDeut :'+stockDeut);
         addToLogs('fret :'+fret);
-        addToLogs('nbGT :'+nbGT);
+        addToLogs('nbGT needed:'+nbGT);
 
-        $('input[name=transporterLarge]').val(nbGT).trigger('keyup');
+        $('input[name=transporterLarge]').val(nbGT).trigger('keyup').trigger('blur');
         addToLogs('nbGT selected :'+$('input[name=transporterLarge]').val());
         $('#continueToFleet2').trigger('click');
         $('input#galaxy').val(home.coords[0]).trigger('keyup');
@@ -310,16 +311,52 @@
         $('#selectMaxCrystal').trigger('click');
         $('#selectMaxMetal').trigger('click');
 
+        if (nbGT != $('input[name=transporterLarge]').val()) {
+            if (parseInt($('input[name=transporterLarge]').val()) == parseInt($('span.transporterLarge>span.amount').text()))
+                addToLogs('nombre insuffisant de GT')
+            else{
+                addToLogs('# ERROR GOHOME NBGT');
+                return false;
+            }
+        }
+
         if (getData('action') == 'goHome')
             setData('action', 'idle');
         if (getData('action') == 'rally' && getData('arrPlanetTodo') == '')
             setData('action', 'idle');
+        
+        sendFleet();
+    }
+
+    var createCDR = function createCDR(){
+        addToLogs('# createCDR');
+
+        var coords = getData('arrCDRToDo').split(',')[0].split(':');
+        addToLogs('target coords  : ' + coords.join(':'));
+
+        $('input[name=espionageProbe]').val(1).trigger('keyup').trigger('blur');
+        $('#continueToFleet2').trigger('click');
+        $('input#galaxy').val(coords[0]).trigger('keyup');
+        $('input#system').val(coords[1]).trigger('keyup');
+        $('input#position').val(coords[2].split('-')[0]).trigger('keyup');
+        addToLogs('moon  : ' + (coords[2].split('-')[1] == 'm'));
+        $('#pbutton').trigger('click');
+        if (coords[2].split('-')[1] == 'm')
+            $('#mbutton').trigger('click');
+        $('#continueToFleet3').trigger('click');
+        $('#missionButton1').trigger('click');
+
+        setData('arrCDRToDo', getData('arrCDRToDo').split(',').slice(1).join(','));
+
+        if (getData('arrCDRToDo') == '')
+            setData('action', 'idle');
+
         sendFleet();
     }
 
     var timerReady;
     var sendFleet = function(){
-        addToLogs('waiting to send fleet...')
+        addToLogs('waiting to send fleet...',false)
         clearTimeout(timerReady);
         if ($('#fleet3').length) {
             timerReady = setTimeout(function(){
@@ -340,7 +377,7 @@
         var style = document.createElement('style');
         style.innerHTML = '';
         style.innerHTML += '#toolbarcomponent,#links{max-width: 100%;}';
-        style.innerHTML += '.ogm__logs{position: fixed; bottom:20px; left:-17px; padding: 10px; font-size:0.6rem; color: white; font-family: monospace; max-height: 90vh; overflow: auto; direction: rtl; }';
+        style.innerHTML += '.ogm__logs{position: fixed; bottom:20px; left:-17px; padding: 10px; font-size:0.6rem; color: white; font-family: monospace; max-height: 90vh; overflow: auto; direction: rtl; max-width: 22vw; z-index: 0;}';
         style.innerHTML += '.ogm__logs .log{opacity:0.2; cursor: default;  direction: ltr;}';
         style.innerHTML += '.ogm__logs .log:hover{opacity:1}';
         style.innerHTML += '.ogm__logs hr+br{display:none;}';
