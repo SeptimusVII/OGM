@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.2.0
+// @version        0.2.1
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -18,9 +18,22 @@
 (function() {
     'use strict';
     var delaySendFleet = 500;
-    var displayPreviousLogs = true;
     var planets = {};
+    var getData = function(name){
+        var data = localStorage.getItem('ogm__'+name);
+        return data;
+    }
+    var setData = function(name,value){
+        localStorage.setItem('ogm__'+name,value);
+        if (name != 'logs') {
+            addToLogs('Changed '+name+' value to '+value);
+        }
+    }
+    var displayPreviousLogs = (getData('displayPreviousLogs') === 'true') || false;
+    var displayLogs         = (getData('displayLogs') === 'true') || false;
     var addToLogs = function(str, store = true, displayDate = true){
+        if (!displayLogs)
+            return false;
         var lb = '';
         if (str.includes('#'))
             lb = '<br>';
@@ -44,26 +57,18 @@
         $('.ogm__logs').html('');
         addToLogs('# clearLogs');
     }
-    var getData = function(name){
-        var data = localStorage.getItem('ogm__'+name);
-        return data;
-    }
-    var setData = function(name,value){
-        localStorage.setItem('ogm__'+name,value);
-        if (name != 'logs') {
-            addToLogs('Changed '+name+' value to '+value);
-        }
-    }
     var initDom = function(){
         $('<div class="ogm__logs"></div>').appendTo('body');
-        $('<button class="ogm__clearLogs">clear logs</button>').appendTo('body');
-        // writing previous logs
-        if (getData('logs') && displayPreviousLogs) {
-            var logs = getData('logs').split(',');
-            if (logs.length > 100)
-                logs.splice(0,logs.length - 100);
-            for(var log of logs)
-                addToLogs(log, false, false)
+        if (displayLogs){
+            $('<button class="ogm__clearLogs">clear logs</button>').appendTo('body');
+            // writing previous logs
+            if (getData('logs') && displayPreviousLogs) {
+                var logs = getData('logs').split(',');
+                if (logs.length > 100)
+                    logs.splice(0,logs.length - 100);
+                for(var log of logs)
+                    addToLogs(log, false, false)
+            }
         }
         addToLogs('<br><hr>',false,false);
         addToLogs('# initDom',false);
@@ -76,6 +81,7 @@
                             <span class="button explo active">Exploration</span>
                             <span class="button rally">Rapatriement</span>
                             <span class="button createCDR">CDR(s)</span>
+                            <span class="button divers">Divers</span>
                         </div>
                         <div class="tabs__wrapper">
                             <div class="tab explo active">
@@ -158,6 +164,17 @@
                                 <br>
                                 <i>Indiquez une liste de coordonnées, chacune séparée par une virgule. Pour indiquer une lune, ajoutez "-m" à la fin des coordonnées. ex: 1:365:5,1:444:8-m,3:52:1</i>
                             </div>
+                            <div class="tab divers">
+                                <p style="font-size:1.5em; margin-bottom: 0.5em;">Logs</p>
+                                <input type="checkbox" name="displayLogs" class="saveOnChange" id="ogm__input--displayLogs" ${getData('displayLogs') == 'true'?'checked':''}>
+                                <label for="ogm__input--displayLogs">Afficher les logs</label>
+                                <br>
+                                <br>
+                                <input type="checkbox" name="displayPreviousLogs" class="saveOnChange" id="ogm__input--displayPreviousLogs--local" ${getData('displayPreviousLogs') == 'true'?'checked':''}>
+                                <label for="ogm__input--displayPreviousLogs--local">Afficher les logs plus anciens</label>
+                                <br>
+                                <i>Veuillez recharger la page pour appliquer les changements aux options ci-dessus.</i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -208,7 +225,10 @@
             });
         });
         $('body').on('change','.saveOnChange',function(){
-            setData(this.name, this.value);
+            var value = this.value;
+            if (this.type=="checkbox")
+                value = this.checked;
+            setData(this.name, value);
         });
 
         var modalMouseDown;
