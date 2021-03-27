@@ -9,7 +9,7 @@
 // @grant		   GM_xmlhttpRequest
 // @updateURL      https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
 // @downloadURL    https://raw.githubusercontent.com/SeptimusVII/OGM/main/OGM.js
-// @version        0.2.1
+// @version        0.2.2
 
 // @include        *.ogame*gameforge.com/game/index.php?page=*
 // @exclude        *.ogame*gameforge.com/game/index.php?page=displayMessageNewPage*
@@ -207,11 +207,12 @@
             setData('arrCDRToDo', '');
             setData('action', 'iddle');
         });
+        var $btnAutoCheck   = $('<span class="ogm__btn-link" style="text-align: center;" data-ogmaction="autoCheck">Check planets</span>');
         $('#links')
             .append($feature.clone().append('<p class="title">Rapatriement</p>').append($selectPlanet).append('<br>').append($btnGoHome).append($btnRally))
             .append($feature.clone().append('<p class="title">Exploration</p>').append($btnExplo).append($btnExploAll))
             .append($feature.clone().append('<p class="title">Générer CDR(s)</p>').append($btnCDR))
-            .append($feature.clone().css('text-align','center').append($btnConfig).append(' | ').append($btnKillScript));
+            .append($feature.clone().css('text-align','center').append($btnConfig).append(' | ').append($btnKillScript).append(' | ').append($btnAutoCheck));
         addToLogs('UI added to dom',false);
 
         $('.tabs .tabs__nav .button').each(function(index,button){
@@ -428,7 +429,7 @@
         style.innerHTML += '.ogm__btn-icon.attack       {background-position: -432px 0px;}';
         style.innerHTML += '.ogm__btn-icon.attackGroup  {background-position: -486px 0px;}';
         style.innerHTML += '.ogm__btn-icon.destroy      {background-position: -540px 0px;}';
-        style.innerHTML += '.ogm__btn-link              {font-style: italic; text-decoration: underline; opacity: 0.4; cursor: pointer;}';
+        style.innerHTML += '.ogm__btn-link              {font-style: italic; text-decoration: underline; opacity: 0.4; cursor: pointer; white-space:nowrap; margin: 2.5px; display: inline-block;}';
         style.innerHTML += '.ogm__btn-link:hover        {text-decoration: none; opacity: 1;}';
         
         style.innerHTML += '.ogm__modal          {position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items:center; opacity:0; display: none; pointer-events: none; z-index: 1000; }';
@@ -454,6 +455,8 @@
         style.innerHTML += '.input--group input[type=number]{width: 100px; float: right;}';
         style.innerHTML += '.selectPlanet {font-size: 1.25em; padding: 0.5em; margin-bottom: 0.5em; max-width: 100%;}';
         style.innerHTML += '.selectPlanet option {font-size: 1em}';
+
+        style.innerHTML += '.needed_fleet .gt {font-size: 1.5em; border: 1px solid white; padding: 0em 0.15em; display: inline-block; line-height: 1.1;}';
         
         document.head.appendChild(style);
         // addToLogs('styles OK');
@@ -522,6 +525,29 @@
                 else{
                     setData('action', action);
                     window.location.href = window.location.href.split('?')[0] + `?page=ingame&component=fleetdispatch&cp=${planets[currentPlanet].id}`;
+                }
+            break;
+            case 'autoCheck':
+                addToLogs('arrPlanetTodo: ', getData('arrPlanetTodo'));
+                if (getData('arrPlanetTodo') == '' || !getData('arrPlanetTodo')) {
+                    var arrPlanetTodo = [];
+                    for(var p in planets)
+                        if (!planets[p].isMoon)
+                            arrPlanetTodo.push(p);
+                    setData('arrPlanetTodo', arrPlanetTodo.join(','));
+                    dispatch();
+                } else {
+                    var arrPlanetTodo = getData('arrPlanetTodo').split(',');
+                    if (params.component && params.component == 'fleetdispatch' && currentPlanet == arrPlanetTodo[0]){
+                        setData('arrPlanetTodo', arrPlanetTodo.slice(1).join(','));
+                        if (getData('arrPlanetTodo') == '')
+                            setData('action', 'idle');
+                        dispatch();
+                    }
+                    else{
+                        setData('action', action);
+                        window.location.href = window.location.href.split('?')[0] + `?page=ingame&component=fleetdispatch&cp=${planets[arrPlanetTodo[0]].id}`;
+                    }
                 }
             break;
             case 'idle': 
